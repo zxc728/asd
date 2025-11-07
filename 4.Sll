@@ -1,27 +1,88 @@
-// sll_students.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-typedef struct S{ char usn[16],name[32],br[8]; int sem; char ph[16]; struct S *next;} Node;
-Node *head=NULL;
-Node* new(char*u,char*n,char*b,int s,char*p){ Node* t=malloc(sizeof *t); strcpy(t->usn,u); strcpy(t->name,n); strcpy(t->br,b); t->sem=s; strcpy(t->ph,p); t->next=NULL; return t;}
-void push_front(Node* n){ n->next=head; head=n; }
-void insert_end(Node* n){
-    if(!head){ head=n; return;}
-    Node *p=head; while(p->next) p=p->next; p->next=n;
+
+struct node {
+    char usn[10], name[10], branch[5];
+    int sem, ph;
+    struct node *link;
+} *first = NULL, *temp, *cur, *prev;
+
+int count = 0;
+
+void create() {
+    temp = malloc(sizeof(struct node));
+    if (!temp) { printf("Memory not available\n"); exit(0); }
+    printf("Enter USN, Name, Branch, Sem, Phone: ");
+    scanf("%s %s %s %d %d", temp->usn, temp->name, temp->branch, &temp->sem, &temp->ph);
+    temp->link = NULL; count++;
 }
-void del_front(){ if(!head) {printf("Empty\n"); return;} Node*t=head; head=head->next; free(t); }
-void del_end(){ if(!head){printf("Empty\n"); return;} if(!head->next){ free(head); head=NULL; return;} Node*p=head; while(p->next->next) p=p->next; free(p->next); p->next=NULL; }
-void show(){ int c=0; for(Node*p=head;p;p=p->next){ printf("%s %s %s %d %s\n",p->usn,p->name,p->br,p->sem,p->ph); c++; } printf("Count=%d\n",c); }
-int main(){
-    // create by front insertion
-    push_front(new("01","Alice","CSE",3,"999"));
-    push_front(new("02","Bob","ECE",2,"888"));
-    push_front(new("03","Carol","ME",4,"777"));
-    printf("After front-insertion:\n"); show();
-    insert_end(new("04","Dan","CSE",1,"666"));
-    printf("After insert end:\n"); show();
-    del_front(); printf("After del front:\n"); show();
-    del_end(); printf("After del end:\n"); show();
-    return 0;
+
+void insertfront() {
+    create();
+    temp->link = first;
+    first = temp;
+}
+
+void insertrear() {
+    create();
+    if (!first) first = temp;
+    else {
+        cur = first;
+        while (cur->link) cur = cur->link;
+        cur->link = temp;
+    }
+}
+
+void deletefront() {
+    if (!first) printf("List empty\n");
+    else {
+        cur = first; first = first->link;
+        free(cur); count--;
+        printf("Front node deleted\n");
+    }
+}
+
+void deleterear() {
+    if (!first) printf("List empty\n");
+    else if (!first->link) { free(first); first = NULL; count--; }
+    else {
+        cur = first;
+        while (cur->link) { prev = cur; cur = cur->link; }
+        prev->link = NULL; free(cur); count--;
+        printf("Last node deleted\n");
+    }
+}
+
+void display() {
+    if (!first) printf("No records\n");
+    else {
+        printf("\nUSN\tName\tBranch\tSem\tPhone\n");
+        printf("--------------------------------------\n");
+        cur = first;
+        while (cur) {
+            printf("%s\t%s\t%s\t%d\t%d\n", cur->usn, cur->name, cur->branch, cur->sem, cur->ph);
+            cur = cur->link;
+        }
+        printf("Total Records: %d\n", count);
+    }
+}
+
+int main() {
+    int ch, n;
+    while (1) {
+        printf("\n1.Create 2.Display 3.InsRear 4.DelRear 5.InsFront 6.DelFront 7.Exit\nChoice: ");
+        scanf("%d", &ch);
+        switch (ch) {
+            case 1: printf("How many students? "); scanf("%d", &n);
+                    for (int i=0;i<n;i++) insertfront(); break;
+            case 2: display(); break;
+            case 3: insertrear(); break;
+            case 4: deleterear(); break;
+            case 5: insertfront(); break;
+            case 6: deletefront(); break;
+            case 7: exit(0);
+            default: printf("Invalid choice\n");
+        }
+    }
 }
