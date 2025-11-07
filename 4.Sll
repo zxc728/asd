@@ -1,0 +1,27 @@
+// sll_students.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+typedef struct S{ char usn[16],name[32],br[8]; int sem; char ph[16]; struct S *next;} Node;
+Node *head=NULL;
+Node* new(char*u,char*n,char*b,int s,char*p){ Node* t=malloc(sizeof *t); strcpy(t->usn,u); strcpy(t->name,n); strcpy(t->br,b); t->sem=s; strcpy(t->ph,p); t->next=NULL; return t;}
+void push_front(Node* n){ n->next=head; head=n; }
+void insert_end(Node* n){
+    if(!head){ head=n; return;}
+    Node *p=head; while(p->next) p=p->next; p->next=n;
+}
+void del_front(){ if(!head) {printf("Empty\n"); return;} Node*t=head; head=head->next; free(t); }
+void del_end(){ if(!head){printf("Empty\n"); return;} if(!head->next){ free(head); head=NULL; return;} Node*p=head; while(p->next->next) p=p->next; free(p->next); p->next=NULL; }
+void show(){ int c=0; for(Node*p=head;p;p=p->next){ printf("%s %s %s %d %s\n",p->usn,p->name,p->br,p->sem,p->ph); c++; } printf("Count=%d\n",c); }
+int main(){
+    // create by front insertion
+    push_front(new("01","Alice","CSE",3,"999"));
+    push_front(new("02","Bob","ECE",2,"888"));
+    push_front(new("03","Carol","ME",4,"777"));
+    printf("After front-insertion:\n"); show();
+    insert_end(new("04","Dan","CSE",1,"666"));
+    printf("After insert end:\n"); show();
+    del_front(); printf("After del front:\n"); show();
+    del_end(); printf("After del end:\n"); show();
+    return 0;
+}
