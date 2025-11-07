@@ -1,0 +1,30 @@
+// infix_to_postfix.c
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#define N 200
+char st[N]; int top=-1;
+void push(char c){ if(top<N-1) st[++top]=c;}
+char pop(){ return top>=0?st[top--]:0;}
+char peek(){ return top>=0?st[top]:0;}
+int prec(char c){ if(c=='+'||c=='-')return 1; if(c=='*'||c=='/'||c=='%')return 2; if(c=='^')return 3; return 0;}
+int main(){
+    char in[N],out[N]; int j=0;
+    fgets(in,N,stdin);
+    in[strcspn(in,"\n")]=0;
+    for(int i=0;in[i];++i){
+        char c=in[i];
+        if(isalnum(c)) out[j++]=c;
+        else if(c=='(') push(c);
+        else if(c==')'){ while(top>=0 && peek()!='(') out[j++]=pop(); pop();}
+        else { // operator
+            while(top>=0 && ((prec(peek())>prec(c)) || (prec(peek())==prec(c) && c!='^')) && peek()!='(')
+                out[j++]=pop();
+            push(c);
+        }
+    }
+    while(top>=0) out[j++]=pop();
+    out[j]=0;
+    printf("%s\n",out);
+    return 0;
+}
