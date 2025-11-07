@@ -1,0 +1,25 @@
+// dll.c
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct D{ int data; struct D *l,*r;} Node;
+Node *head=NULL;
+Node* newn(int v){ Node* n=malloc(sizeof* n); n->data=v; n->l=n->r=NULL; return n;}
+void insert_end(int v){
+    Node* n=newn(v);
+    if(!head){ head=n; return; }
+    Node*p=head; while(p->r) p=p->r; p->r=n; n->l=p;
+}
+void insert_front(int v){
+    Node*n=newn(v); if(!head){ head=n; return;} head->l=n; n->r=head; head=n;
+}
+void del_front(){ if(!head) return; Node*t=head; head=head->r; if(head) head->l=NULL; free(t); }
+void del_end(){ if(!head) return; Node*p=head; while(p->r) p=p->r; if(p->l) p->l->r=NULL; else head=NULL; free(p); }
+void show(){ int c=0; for(Node*p=head;p;p=p->r){ printf("%d ",p->data); c++; } printf("\nCount=%d\n",c); }
+int main(){
+    insert_end(1); insert_end(2); insert_end(3);
+    printf("After end-insert:\n"); show();
+    insert_front(0); printf("After insert front:\n"); show();
+    del_front(); printf("After del front:\n"); show();
+    del_end(); printf("After del end:\n"); show();
+    return 0;
+}
