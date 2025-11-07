@@ -1,0 +1,19 @@
+// paths.c
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct T{ int v; struct T *l,*r;} Node;
+Node* n(int v){ Node*p=malloc(sizeof*p); p->v=v; p->l=p->r=NULL; return p;}
+void printArr(int a[],int n){ for(int i=0;i<n;i++) printf("%d ",a[i]); printf("\n"); }
+void paths(Node* r,int path[],int idx){
+    if(!r) return;
+    path[idx++]=r->v;
+    if(!r->l && !r->r) printArr(path,idx);
+    else { paths(r->l,path,idx); paths(r->r,path,idx); }
+}
+int main(){
+    Node* root=n(1); root->l=n(2); root->r=n(3);
+    root->l->l=n(4); root->l->r=n(5);
+    int path[100];
+    paths(root,path,0);
+    return 0;
+}
