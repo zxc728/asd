@@ -1,0 +1,29 @@
+// eval_postfix.c
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <math.h>
+int st[100],top=-1;
+void push(int v){ st[++top]=v; }
+int pop(){ return top>=0?st[top--]:0; }
+int main(){
+    char s[200]; fgets(s,200,stdin);
+    s[strcspn(s,"\n")]=0;
+    for(int i=0;s[i];++i){
+        char c=s[i];
+        if(isdigit(c)) push(c-'0');
+        else if(c==' '||c=='\t') continue;
+        else{
+            int b=pop(), a=pop(), r=0;
+            if(c=='+') r=a+b;
+            else if(c=='-') r=a-b;
+            else if(c=='*') r=a*b;
+            else if(c=='/') r=b? a/b:0;
+            else if(c=='%') r=b? a%b:0;
+            else if(c=='^') r=(int)pow(a,b);
+            push(r);
+        }
+    }
+    printf("%d\n", pop());
+    return 0;
+}
