@@ -1,25 +1,153 @@
-// dll.c
 #include <stdio.h>
 #include <stdlib.h>
-typedef struct D{ int data; struct D *l,*r;} Node;
-Node *head=NULL;
-Node* newn(int v){ Node* n=malloc(sizeof* n); n->data=v; n->l=n->r=NULL; return n;}
-void insert_end(int v){
-    Node* n=newn(v);
-    if(!head){ head=n; return; }
-    Node*p=head; while(p->r) p=p->r; p->r=n; n->l=p;
+#include <string.h>
+
+struct node {
+    int empid; 
+    struct node *next;
+};
+typedef struct node *NODE;
+NODE get() {
+    NODE x = (NODE)malloc(sizeof(struct node));
+    if (x == NULL) {
+        printf("Insufficient memory\n");
+        exit(0);
+    }
+    return x;
 }
-void insert_front(int v){
-    Node*n=newn(v); if(!head){ head=n; return;} head->l=n; n->r=head; head=n;
+
+// Function to read student data
+NODE read(NODE t) {
+    printf("Enter empid: ");
+    scanf("%d", &t->empid);
+    t->next = NULL;
+    return t;
 }
-void del_front(){ if(!head) return; Node*t=head; head=head->r; if(head) head->l=NULL; free(t); }
-void del_end(){ if(!head) return; Node*p=head; while(p->r) p=p->r; if(p->l) p->l->r=NULL; else head=NULL; free(p); }
-void show(){ int c=0; for(Node*p=head;p;p=p->r){ printf("%d ",p->data); c++; } printf("\nCount=%d\n",c); }
-int main(){
-    insert_end(1); insert_end(2); insert_end(3);
-    printf("After end-insert:\n"); show();
-    insert_front(0); printf("After insert front:\n"); show();
-    del_front(); printf("After del front:\n"); show();
-    del_end(); printf("After del end:\n"); show();
-    return 0;
+
+// Free a node
+void freen(NODE x) {
+    free(x);
+}
+
+// Insert at front
+NODE insert_front(NODE first) {
+    NODE t = get();
+    t = read(t);
+    t->next = first;
+    return t;
+}
+
+// Insert at rear
+NODE insert_rear(NODE first) {
+    NODE t = get();
+    t = read(t);
+    t->next = NULL;
+    if (first == NULL)
+        return t;
+    NODE cur = first;
+    while (cur->next != NULL)
+        cur = cur->next;
+    cur->next = t;
+    return first;
+}
+
+// Delete from front
+NODE delf(NODE first) {
+    if (first == NULL) {
+        printf("List empty\n");
+        return first;
+    }
+    NODE t = first;
+    first = first->next;
+    printf("Deleted from front:%d\n", t->empid);
+    freen(t);
+    return first;
+}
+
+// Delete from rear
+NODE delr(NODE first) {
+    if (first == NULL) {
+        printf("List empty\n");
+        return first;
+    }
+    NODE cur = first, prev = NULL;
+    if (first->next == NULL) {
+        printf("Deleted from rear:%d\n", first->empid);
+        freen(first);
+        return NULL;
+    }
+    while (cur->next != NULL) {
+        prev = cur;
+        cur = cur->next;
+    }
+    printf("Deleted from rear:%d\n", cur->empid);
+    freen(cur);
+    prev->next = NULL;
+    return first;
+}
+
+// Display list
+void display(NODE first) {
+    if (first == NULL) {
+        printf("List empty\n");
+        return;
+    }
+    NODE t = first;
+    int count = 0;
+    printf("\nThe contents are:\n");
+    // Header based on the print order: Name, Branch, USN, Sem, P
+    printf("EMPID\n"); 
+    while (t != NULL) {
+        printf("%d\n", t->empid);
+        t = t->next;
+        count++;
+    }
+    printf("Total students: %d\n", count);
+}
+
+// Main menu
+int main() {
+    NODE first = NULL;
+    int choice, n, i;
+
+    for (;;) {
+        printf("\n--- STUDENT LINKED LIST MENU ---\n");
+        printf("1. Create (Insert Front N times)\n");
+        printf("2. Display\n");
+        printf("3. Insert Front (1)\n");
+        printf("4. Insert Rear (1)\n");
+        printf("5. Delete Rear\n");
+        printf("6. Delete Front\n");
+        printf("7. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter number of Employees: ");
+                scanf("%d", &n);
+                for (i = 0; i < n; i++)
+                    first = insert_front(first);
+                break;
+            case 2:
+                display(first);
+                break;
+            case 3:
+                first = insert_front(first);
+                break;
+            case 4:
+                first = insert_rear(first);
+                break;
+            case 5:
+                first = delr(first);
+                break;
+            case 6:
+                first = delf(first);
+                break;
+            case 7:
+                exit(0);
+            default:
+                printf("Invalid choice\n");
+        }
+    }
 }
